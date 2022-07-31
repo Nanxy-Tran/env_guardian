@@ -1,4 +1,4 @@
-module env_guardian
+module github.com/Nanxy-Tran/env_guardian
 
 go 1.18
 
