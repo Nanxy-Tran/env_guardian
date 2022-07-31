@@ -23,13 +23,12 @@ var results = ScanResult{}
 func main() {
 
 	app := &cli.App{
-		Name:  "missing_env",
-		Usage: "make an explosive entrance",
+		Name:  "Env guardian",
+		Usage: "Scan missing env variables",
 
 		Commands: []*cli.Command{
-
 			{
-				Name:  "scan_env",
+				Name:  "env",
 				Usage: "complete a task on the list",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
@@ -82,17 +81,16 @@ func run(framework string, envPath string) {
 
 	for line := range invalidLineChans {
 		select {
-		case authorsString := <-line:
-			countInvalidTranslation(authorsString)
+		case invalidLine := <-line:
+			countInvalidLine(invalidLine)
 		}
 	}
 
 	for line := range invalidLineChans {
 		select {
-		case authorsString := <-line:
-			countInvalidTranslation(authorsString)
+		case invalidLine := <-line:
+			countInvalidLine(invalidLine)
 		default:
-
 		}
 	}
 
@@ -170,7 +168,7 @@ func checkLines(filePath string, envs []string) <-chan string {
 				if contains(envs, variable) {
 					continue
 				} else {
-					fmt.Println(variable, " is missing in env")
+					lineChan <- variable
 				}
 			}
 		}
@@ -179,7 +177,7 @@ func checkLines(filePath string, envs []string) <-chan string {
 	return lineChan
 }
 
-func countInvalidTranslation(filePath string) {
+func countInvalidLine(filePath string) {
 	if filePath == "" {
 		return
 	}
@@ -188,7 +186,7 @@ func countInvalidTranslation(filePath string) {
 
 func printResult(results ScanResult) {
 	if len(results) == 0 {
-		fmt.Println("No hardcode found !")
+		fmt.Println("No stale env variable found !")
 		return
 	}
 	for _, filePath := range results {
